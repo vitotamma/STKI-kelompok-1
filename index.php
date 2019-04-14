@@ -1,4 +1,13 @@
-  <!DOCTYPE html>
+<?php
+
+include './connection.php';
+
+$sql= "SELECT * FROM document";
+$query = mysqli_query($conn, $sql);
+
+?>
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -25,6 +34,9 @@
       padding-top: 2.5rem;
       padding-bottom: 2.5rem;
     }
+    select{
+      text-overflow: ellipsis;
+    }
   </style>
 
 </head>
@@ -50,16 +62,21 @@
     <div class="container text-center">
       <div class="row">
         <div class="col-lg-12 mx-auto">
-          <h2>Masukkan dokumen yang ingin di stem !</h2>
+          <h2>Masukkan atau Pilih dokumen yang ingin di stem !</h2>
+          <br>
+          <select class="custom-select custom-select-lg mb-3" onchange="selectDocument()" id="select-doc">
+            <option value="new" selected>Input Dokumen Baru</option>
+            <?php while ($doc = mysqli_num_rows($query) > 0) { ?>
+              <option value="<?php echo($doc['id']) ?>"><?php echo($doc['document']) ?></option>
+            <?php } ?>
+          </select>
           <form action="./stem.php" method="post">
             <div class="form-group">
               <br>
               <textarea name="dokumen" class="form-control" id="dokumen" cols="100" rows="15"></textarea>
               <br>
-              <input type="text" hidden id="algorithm" name="algorithm">
-              <input type="button" class="btn btn-xl btn-info mr-4" value="Nazief" id="nazief">
-              <input type="button" class="btn btn-xl btn-dark mr-4" value="Gabungan" id="gabungan">
-              <input type="button" class="btn btn-xl btn-info mr-4" value="EHCS" id="ehcs">              
+              <input type="text" hidden id="algorithm" name="algorithm">              
+              <input type="button" class="btn btn-xl btn-dark mr-4" value="Gabungan" id="gabungan">              
             </div>
           </form>
         </div>
@@ -84,21 +101,22 @@
   <!-- Custom scripts for this template -->
   <script src="js/stylish-portfolio.min.js"></script>
 
-  <script>
-    $('#nazief').on('click', function(){
-      $('#algorithm').val('nazief');            
-      $('form').submit();
-    });
-    
+  <script>        
     $('#gabungan').on('click', function(){
       $('#algorithm').val('gabungan');
+      if ($('#dokumen').val()=='' || $('#dokumen').val()==undefined || $('#dokumen').val()==null) {
+        alert('Dokumen harus dipilih/diisi');
+      }
       $('form').submit();
-    });
+    });    
 
-    $('#ehcs').on('click', function(){
-      $('#algorithm').val('ehcs');
-      $('form').submit();
-    })
+    function selectDocument() {
+      var doc = $('#select-doc').val();
+      console.log(`selected document ${doc}`);
+      if (doc!='new') {
+          $('#dokumen').val($('#select-doc :selected').text());
+      }
+    }
   </script>
 
 </body>
