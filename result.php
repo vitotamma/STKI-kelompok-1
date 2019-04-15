@@ -72,7 +72,7 @@
       <a href="#table_result" class="btn btn-xl btn-dark mr-4 lihatdokumen">Lihat Semua Dokumen</a>
       <a href="#table_result" class="btn btn-xl btn-light mr-4 hasilstem">Lihat Hasil Stem</a>
       <br><br>
-      <a href="index.php" class="btn btn-xl btn-light mr-4">Stem Lagi...</a>
+      <a href="index.html" class="btn btn-xl btn-light mr-4">Stem Lagi...</a>
 
     </div>
     <div class="overlay"></div>

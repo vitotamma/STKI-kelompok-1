@@ -1,12 +1,3 @@
-<?php
-
-include './connection.php';
-
-$sql= "SELECT * FROM document";
-$query = mysqli_query($conn, $sql);
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -65,10 +56,7 @@ $query = mysqli_query($conn, $sql);
           <h2>Masukkan atau Pilih dokumen yang ingin di stem !</h2>
           <br>
           <select class="custom-select custom-select-lg mb-3" onchange="selectDocument()" id="select-doc">
-            <option value="new" selected>Input Dokumen Baru</option>
-            <?php while ($doc = mysqli_num_rows($query) > 0) { ?>
-              <option value="<?php echo($doc['id']) ?>"><?php echo($doc['document']) ?></option>
-            <?php } ?>
+            <option value="new" selected>Input Dokumen Baru</option>          
           </select>
           <form action="./stem.php" method="post">
             <div class="form-group">
@@ -76,7 +64,7 @@ $query = mysqli_query($conn, $sql);
               <textarea name="dokumen" class="form-control" id="dokumen" cols="100" rows="15"></textarea>
               <br>
               <input type="text" hidden id="algorithm" name="algorithm">              
-              <input type="button" class="btn btn-xl btn-dark mr-4" value="Gabungan" id="gabungan">              
+              <input type="button" class="btn btn-xl btn-dark mr-4" value="Stem Berita" id="gabungan">              
             </div>
           </form>
         </div>
@@ -102,13 +90,27 @@ $query = mysqli_query($conn, $sql);
   <script src="js/stylish-portfolio.min.js"></script>
 
   <script>        
+    $(document).ready(function(){
+      $('#dokumen').val('');
+      $.ajax({
+        type:"GET",
+        url:"dokumen.php",
+        dataType:"html",
+        success: function(response){
+          console.log('success');
+          
+          $("#select-doc").append(response);
+        }
+      })
+    })
+    
     $('#gabungan').on('click', function(){
       $('#algorithm').val('gabungan');
       if ($('#dokumen').val()=='' || $('#dokumen').val()==undefined || $('#dokumen').val()==null) {
         alert('Dokumen harus dipilih/diisi');
       }
       $('form').submit();
-    });    
+    });
 
     function selectDocument() {
       var doc = $('#select-doc').val();
