@@ -6,7 +6,13 @@
     $sqlStem = "SELECT id, kata, kata_dasar_1, kata_dasar_2, waktu_1, waktu_2, status_1, status_2, SUM(frekuensi) as frekuensi
                 FROM `kata` INNER JOIN document_kata ON kata.id = document_kata.id_kata
                 GROUP BY document_kata.id_kata";
-    $queryStem = mysqli_query($conn, $sqlStem);    
+    $sqlRataPersentase = "SELECT AVG(waktu_1),AVG(waktu_2), AVG(status_1),AVG(status_2) FROM kata";
+
+    $queryStem = mysqli_query($conn, $sqlStem);
+    $mysql = mysqli_query($conn, $sqlRataPersentase);
+
+    $rataPersen = mysqli_fetch_assoc($mysql);
+
 
     // query dokumen
     $sqlDokumen = "SELECT * FROM document";
@@ -40,7 +46,7 @@
       padding-top: 2.5rem;
       padding-bottom: 2.5rem;
       background-color: #fff!important;
-    }    
+    }
     #list_dokumen{
         display: block;
         margin-top: 50px;
@@ -85,7 +91,7 @@
         <div class="col-lg-12 mx-auto">
         <nav class="nav nav-pills nav-fill">
             <a class="nav-item nav-link active lihatdokumen">Daftar Dokumen</a>
-            <a class="nav-item nav-link hasilstem">Hasil Stemming</a>                    
+            <a class="nav-item nav-link hasilstem">Hasil Stemming</a>
         </nav>
         <div id="list_dokumen">
             <!-- table contains document goes here -->
@@ -109,7 +115,7 @@
         <div id="hasil_stem">
             <!-- table contains stem result goes here -->
             <table class="table_stem table table-bordered table-hover">
-                <thead>                    
+                <thead>
                     <tr>
                         <th>ID</th>
                         <th>Kata</th>
@@ -123,8 +129,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php 
-                        while ($stem = mysqli_fetch_assoc($queryStem)) {?>                                                
+                    <?php
+                        while ($stem = mysqli_fetch_assoc($queryStem)) {?>
                     <tr>
                         <td><?php echo($stem['id']) ?></td>
                         <td><?php echo($stem['kata']) ?></td>
@@ -141,12 +147,21 @@
                     ?>
                 </tbody>
             </table>
-        </div>        
+        </div>
         </div>
       </div>
+      <b><?php echo "rata2 waktu Nazief dan Adriani : ".$rataPersen['AVG(waktu_1)'] ?>detik
+      <br>
+      <?php echo "rata2 waktu EHCS : ".$rataPersen['AVG(waktu_1)'] ?>detik
+      <br>
+      <?php echo "Persentas Keberhasilan Nazief dan Adriani : ".$rataPersen['AVG(status_1)']*100 ?>%
+      <br>
+      <?php echo "Persentas Keberhasilan EHCS : ".$rataPersen['AVG(status_2)']*100 ?>%</b>
     </div>
-  </section>
 
+
+
+  </section>
 
 
   <!-- Scroll to Top Button-->
@@ -177,11 +192,11 @@
         })
         $('.hasilstem').on('click', function(){
             $('#list_dokumen').fadeOut(300);
-            $('#hasil_stem').delay(250).fadeIn(500);  
+            $('#hasil_stem').delay(250).fadeIn(500);
             $('.nav-item').removeClass('active');
-            $('.nav-item.hasilstem').addClass('active');          
+            $('.nav-item.hasilstem').addClass('active');
         })
-    })    
+    })
   </script>
 
 </body>

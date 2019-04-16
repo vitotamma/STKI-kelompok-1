@@ -5,11 +5,12 @@ require_once __DIR__ . '/vendor/autoload.php';
 include './ehcs.php';
 include './vendor/sastrawi/sastrawi/src/Sastrawi/Stemmer/Filter/TextNormalizer.php';
 
-$stemmerFactory = new \Sastrawi\Stemmer\StemmerFactory();
-$stemmer = $stemmerFactory->createStemmer();
+
 
 if (isset($_POST['dokumen'])) {
+  if($_POST['select-doc']=='new'){
     postDocument($_POST['dokumen']);
+  }
 
     $normalizer = normalizer($_POST['dokumen']);
 
@@ -21,16 +22,16 @@ if (isset($_POST['dokumen'])) {
 function postDocument($data)
 {
     global $conn;
-    $query = "INSERT INTO document(document) VALUES('$data')";    
+    $query = "INSERT INTO document(document) VALUES('$data')";
 
     $result = mysqli_query($conn,$query);
 
     if ($result) {
         $id_doc = mysqli_insert_id($conn);
-        
+
         $normalized_word = normalizer($data);
         $doc_word = explode(' ', $normalized_word);
-        
+
         $arr = ['id_doc'=>$id_doc, 'array'=>$doc_word];
         postKata($arr);
     } else{
@@ -43,7 +44,7 @@ function postKata($kata){
     // echo 'postKata masuk'.'<br>';
     foreach ($kata['array'] as $word) {
         $find = findKata($word);
-        
+
         if ($find['ketemu']) {
             // echo 'findKata ketemu'.'<br>';
             // if (mysqli_num_rows($find['query']) > 0) {
@@ -60,7 +61,7 @@ function postKata($kata){
                     createDocumentKata($arr);
                 }
             // }
-            
+
         } else{
             // echo 'findKata tidak ketemu, buat baru'.'<br>';
             $id_doc = $kata['id_doc'];
@@ -157,14 +158,16 @@ function getAllKata()
 
 function stemNazief($data)
 {
-    global $stemmer;
+    $stemmerFactory = new \Sastrawi\Stemmer\StemmerFactory();
+    $stemmer = $stemmerFactory->createStemmer();
+    // global $stemmer;
     $dictionary = __DIR__ . './vendor/sastrawi/sastrawi/data/kata-dasar.txt';
     $dict_kata_dasar = explode("\n", file_get_contents($dictionary));
-    
+
     $start = microtime(true);
     $stem = $stemmer->stem($data['kata']);
     $elapsedTime = number_format((microtime(true) - $start),4,'.','');
-    
+
     if (in_array($stem, $dict_kata_dasar)) {
         return ['kata_asal' => $data['kata'], 'stem' => $stem, 'waktu' => $elapsedTime, 'status' => 1];
     } else{
@@ -190,14 +193,17 @@ function stemGabungan()
 {
     global $conn;
     echo 'stem gabungan<br><br>';
-    $list = getAllKata();
+    $list = getKataNotStemmed();
 
     foreach ($list as $kata) {
         $nazief = stemNazief($kata);
         $ehcs = stemEhcs($kata);
-        $result = ['id' => $kata['id'], 'kata' => $kata['kata'], 'stem_nazief' => $nazief['stem'], 'stem_ehcs' => $ehcs['stem'], 'waktu_nazief' => $nazief['waktu'], 'waktu_ehcs' => $ehcs['waktu'], 'status_nazief' => $nazief['status'], 'status_ehcs' => $ehcs['status']];
+        $result = ['id' => $kata['id'], 'kata' => $kata['kata'],
+        'stem_nazief' => $nazief['stem'], 'stem_ehcs' => $ehcs['stem'],
+        'waktu_nazief' => $nazief['waktu'], 'waktu_ehcs' => $ehcs['waktu'],
+        'status_nazief' => $nazief['status'], 'status_ehcs' => $ehcs['status']];
         updateKata($result);
-    }        
+    }
 
 }
 
@@ -214,7 +220,7 @@ function updateKata($kata)
     $status_2 = $kata['status_ehcs'];
 
     $sql = "UPDATE kata SET kata_dasar_1='$kata_dasar_1',kata_dasar_2='$kata_dasar_2',waktu_1='$waktu_1',waktu_2='$waktu_2',status_1='$status_1',status_2='$status_2' WHERE id = $id";
-    
+
     if (mysqli_query($conn, $sql)) {
         // echo $kata['kata'].' telah berhasil diupdate<br>';
         // words updated successfully
@@ -223,7 +229,7 @@ function updateKata($kata)
         // echo $kata['kata'].' gagal diupdate <br>';
         // words failed to update.
     }
-    
+
 }
 
 function normalizer($text)
@@ -234,4 +240,23 @@ function normalizer($text)
 
     return trim($text);
 }
+
+
+function getKataNotStemmed()
+{
+    global $conn;
+    $query = "SELECT * FROM kata WHERE kata_dasar_1 = ''OR kata_dasar_2 = '' OR kata_dasar_1 IS NULL OR kata_dasar_2 IS NULL";
+    $result = mysqli_query($conn, $query);
+    $row = array();
+    if (mysqli_num_rows($result)>0) {
+        while ($kata = mysqli_fetch_assoc($result)) {
+            array_push($row, $kata);
+        }
+        return $row;
+    } else{
+        return mysqli_error($conn);
+    }
+}
+
+
 ?>
