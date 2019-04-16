@@ -152,7 +152,7 @@
       </div>
       <b><?php echo "rata2 waktu Nazief dan Adriani : ".$rataPersen['AVG(waktu_1)'] ?>detik
       <br>
-      <?php echo "rata2 waktu EHCS : ".$rataPersen['AVG(waktu_1)'] ?>detik
+      <?php echo "rata2 waktu EHCS : ".$rataPersen['AVG(waktu_2)'] ?>detik
       <br>
       <?php echo "Persentas Keberhasilan Nazief dan Adriani : ".$rataPersen['AVG(status_1)']*100 ?>%
       <br>
