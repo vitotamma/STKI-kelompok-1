@@ -6,7 +6,7 @@
     $sqlStem = "SELECT id, kata, kata_dasar_1, kata_dasar_2, waktu_1, waktu_2, status_1, status_2, SUM(frekuensi) as frekuensi
                 FROM `kata` INNER JOIN document_kata ON kata.id = document_kata.id_kata
                 GROUP BY document_kata.id_kata";
-    $sqlRataPersentase = "SELECT AVG(waktu_1),AVG(waktu_2), AVG(status_1),AVG(status_2) FROM kata";
+    $sqlRataPersentase = "SELECT AVG(waktu_1),AVG(waktu_2), AVG(status_1),AVG(status_2), SUM(status_1),SUM(status_2) FROM kata";
 
     $queryStem = mysqli_query($conn, $sqlStem);
     $mysql = mysqli_query($conn, $sqlRataPersentase);
@@ -154,9 +154,14 @@
       <br>
       <?php echo "rata2 waktu EHCS : ".$rataPersen['AVG(waktu_2)'] ?>detik
       <br>
-      <?php echo "Persentas Keberhasilan Nazief dan Adriani : ".$rataPersen['AVG(status_1)']*100 ?>%
+      <?php echo "jumlah Keberhasilan Nazief dan Adriani : ".$rataPersen['SUM(status_1)'] ?>
       <br>
-      <?php echo "Persentas Keberhasilan EHCS : ".$rataPersen['AVG(status_2)']*100 ?>%</b>
+      <?php echo "Persentase Keberhasilan Nazief dan Adriani : ".$rataPersen['AVG(status_1)']*100 ?>%
+      <br>
+      <?php echo "jumlah Keberhasilan EHCS : ".$rataPersen['SUM(status_2)'] ?>
+      <br>
+      <?php echo "Persentase Keberhasilan EHCS : ".$rataPersen['AVG(status_2)']*100 ?>%</b>
+      <br>
     </div>
 
 
